@@ -207,12 +207,13 @@ test('non-JSON agent output is forwarded verbatim', async (t) => {
   assert.equal(output.lines[0], 'this is not json');
 });
 
-test('child exit is propagated with its code', async (t) => {
-  const { child, bridge } = setup();
+test('child exit is propagated with its code and stops reading stdin', async (t) => {
+  const { child, input, bridge } = setup();
   child.exit(7);
   const info = await bridge.waitForExit();
   assert.deepEqual(info, { code: 7, signal: null });
   assert.equal(bridge._exitInfo.code, 7);
+  assert.equal(input.destroyed, true, 'stdin must be released so the process can exit');
   t.after(() => bridge.stop());
 });
 
@@ -221,4 +222,74 @@ test('stop() signals the child and resolves', async (t) => {
   t.after(() => bridge.stop());
   await bridge.stop('SIGTERM');
   assert.deepEqual(child.killed, ['SIGTERM']);
+});
+
+test('string request ids correlate with responses', async (t) => {
+  const { child, input, output, bridge } = setup({ synthesizeDelayMs: 0 });
+  t.after(() => bridge.stop());
+
+  write(input, { jsonrpc: '2.0', id: 'new-1', method: 'session/new', params: { cwd: '/w' } });
+  write(child.stdout, { jsonrpc: '2.0', id: 'new-1', result: { sessionId: 's-string' } });
+
+  await output.waitFor((lines) => lines.length === 2);
+  assert.equal(parse(output.lines[1]).params.sessionId, 's-string');
+});
+
+test('session/resume falls back to the requested session id', async (t) => {
+  const { child, input, output, bridge } = setup({ synthesizeDelayMs: 0 });
+  t.after(() => bridge.stop());
+
+  write(input, {
+    jsonrpc: '2.0',
+    id: 8,
+    method: 'session/resume',
+    params: { sessionId: 'existing-session', cwd: '/w' },
+  });
+  write(child.stdout, { jsonrpc: '2.0', id: 8, result: {} });
+
+  await output.waitFor((lines) => lines.length === 2);
+  assert.equal(parse(output.lines[1]).params.sessionId, 'existing-session');
+});
+
+test('session/close drops bookkeeping for that session', async (t) => {
+  const { child, input, output, bridge } = setup({ synthesizeDelayMs: 5000 });
+  t.after(() => bridge.stop());
+
+  write(input, { jsonrpc: '2.0', id: 9, method: 'session/new', params: { cwd: '/w' } });
+  write(child.stdout, { jsonrpc: '2.0', id: 9, result: { sessionId: 's-close' } });
+  await output.waitFor((lines) => lines.length === 1);
+  assert.equal(bridge._sessions.has('s-close'), true);
+
+  write(input, {
+    jsonrpc: '2.0',
+    id: 10,
+    method: 'session/close',
+    params: { sessionId: 's-close' },
+  });
+  write(child.stdout, { jsonrpc: '2.0', id: 10, result: {} });
+  await output.waitFor((lines) => lines.length === 2);
+  assert.equal(bridge._sessions.has('s-close'), false);
+});
+
+test('server-initiated requests and other notifications pass through verbatim', async (t) => {
+  const { child, output, bridge } = setup();
+  t.after(() => bridge.stop());
+
+  const serverRequest = { jsonrpc: '2.0', id: 99, method: 'fs/read_text_file', params: { path: '/x' } };
+  const notification = { jsonrpc: '2.0', method: 'session/update', params: { sessionId: 's', update: { sessionUpdate: 'agent_message_chunk' } } };
+  child.stdout.write(`${JSON.stringify(serverRequest)}\n${JSON.stringify(notification)}\n`);
+
+  await output.waitFor((lines) => lines.length === 2);
+  assert.equal(output.lines[0], JSON.stringify(serverRequest));
+  assert.equal(output.lines[1], JSON.stringify(notification));
+});
+
+test('a child spawn error terminates the bridge', async (t) => {
+  const { child, input, bridge } = setup();
+  t.after(() => bridge.stop());
+
+  child.emit('error', Object.assign(new Error('spawn hermes ENOENT'), { code: 'ENOENT' }));
+  const info = await bridge.waitForExit();
+  assert.deepEqual(info, { code: null, signal: null });
+  assert.equal(input.destroyed, true);
 });

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildSpawnArgs, describeSpawnError, needsShell } from '../lib/spawn.js';
+import { buildSpawnArgs, describeSpawnError, joinCommandLine, needsShell } from '../lib/spawn.js';
 
 test('needsShell is Windows-only and leaves .exe alone', () => {
   assert.equal(needsShell('hermes', 'linux'), false);
@@ -15,13 +15,26 @@ test('needsShell is Windows-only and leaves .exe alone', () => {
 test('buildSpawnArgs honours auto, true and false', () => {
   const auto = buildSpawnArgs({ command: 'hermes', args: ['acp'], shell: 'auto' }, 'win32');
   assert.equal(auto.shell, true);
+  assert.equal(auto.command, 'hermes acp');
+  assert.deepEqual(auto.args, [], 'shell mode must not pass an args array');
   const direct = buildSpawnArgs({ command: 'hermes.exe', args: ['acp'], shell: 'auto' }, 'win32');
   assert.equal(direct.shell, false);
+  assert.deepEqual(direct.args, ['acp']);
   const forced = buildSpawnArgs({ command: 'hermes', args: ['acp'], shell: true }, 'linux');
   assert.equal(forced.shell, true);
+  assert.equal(forced.command, 'hermes acp');
   const off = buildSpawnArgs({ command: 'hermes', args: ['acp'], shell: false }, 'win32');
   assert.equal(off.shell, false);
   assert.deepEqual(off.args, ['acp']);
+});
+
+test('joinCommandLine quotes tokens that need it', () => {
+  assert.equal(
+    joinCommandLine('C:\\Program Files\\hermes.cmd', ['acp', '--x'], 'win32'),
+    '"C:\\Program Files\\hermes.cmd" acp --x',
+  );
+  assert.equal(joinCommandLine('hermes', ['a b'], 'linux'), "hermes 'a b'");
+  assert.equal(joinCommandLine('hermes', [''], 'linux'), "hermes ''");
 });
 
 test('describeSpawnError explains ENOENT and passes other errors through', () => {

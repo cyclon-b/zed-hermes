@@ -241,9 +241,10 @@ your config root if you want it gone too.
   viewer of its gateway daemon. If the daemon is unavailable, commands return
   a refusal instead of running.
 - **Synthesis is a heuristic.** A client that rejects `session/update` before it
-  has registered the session would drop it; the 300 ms delay exists to let the
-  `session/new` response land first. Set `synthesize: false` if you prefer to
-  rely on Hermes' own advertisement only.
+  has registered the session would drop it; the 300 ms delay gives Hermes' own
+  advertisement time to arrive first (the `session/new` response is already
+  written before synthesis is scheduled). Set `synthesize: false` if you prefer
+  to rely on Hermes' own advertisement only.
 - **Not an npm registry package.** Run it from a checkout; the bridge has zero
   runtime dependencies, so there is nothing to install globally.
 - The bridge does not implement ACP presentation features (plan cards, todos,

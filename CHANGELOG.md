@@ -20,7 +20,8 @@ Initial release.
   revert.
 - Documentation: command surface, MCP forwarding, troubleshooting, English and
   Russian READMEs.
-- Tests: 33 cases covering framing, augmentation, synthesis, pass-through of
-  `session/new` (including `mcpServers`), lifecycle, configuration precedence,
-  Windows spawn decisions, and Zed settings editing.
+- Tests covering NDJSON framing, augmentation, synthesis, pass-through of
+  `session/new` (including `mcpServers`), id correlation, session lifecycle,
+  spawn failures, configuration precedence, Windows spawn decisions, and Zed
+  settings editing.
 - CI on Windows and Linux with Node 22.

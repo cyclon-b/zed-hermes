@@ -102,3 +102,10 @@ test('defaultConfigPath is platform-aware', () => {
   assert.match(defaultConfigPath('linux', { XDG_CONFIG_HOME: '/home/x/.config' }), /zed-hermes/);
   assert.match(defaultConfigPath('darwin', {}), /Application Support/);
 });
+
+test('shell accepts auto and string boolean spellings', () => {
+  assert.equal(configFromEnv({ ZED_HERMES_SHELL: 'auto' }).shell, 'auto');
+  assert.equal(resolveConfig({ flags: {}, env: { ZED_HERMES_SHELL: 'auto' } }).shell, 'auto');
+  assert.equal(resolveConfig({ flags: {}, env: { ZED_HERMES_SHELL: 'false' } }).shell, false);
+  assert.equal(resolveConfig({ flags: { shell: false }, env: {} }).shell, false);
+});

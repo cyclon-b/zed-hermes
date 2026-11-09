@@ -57,7 +57,14 @@ function parse(argv) {
     else if (arg === '--doctor') options.doctor = true;
     else if (arg === '--mock') options.mock = true;
     else if (arg === '--prompt') options.prompt = next();
-    else if (arg === '--mcp') options.mcp = JSON.parse(next());
+    else if (arg === '--mcp') {
+      try {
+        options.mcp = JSON.parse(next());
+      } catch {
+        throw new Error('--mcp expects a JSON array');
+      }
+      if (!Array.isArray(options.mcp)) throw new Error('--mcp expects a JSON array');
+    }
     else if (arg === '--timeout-ms') options.timeoutMs = Number(next());
     else throw new Error(`Unknown flag: ${arg}`);
   }
@@ -250,8 +257,19 @@ async function waitForUpdate(notifications, sessionId, timeoutMs) {
   throw new Error('no available_commands_update arrived');
 }
 
-const options = parse(process.argv.slice(2));
-if (options.help) {
+const options = (() => {
+  try {
+    return parse(process.argv.slice(2));
+  } catch (cause) {
+    process.stderr.write(`zed-hermes probe: ${cause instanceof Error ? cause.message : cause}\n`);
+    process.exitCode = 2;
+    return null;
+  }
+})();
+
+if (options === null) {
+  // Usage errors already went to stderr.
+} else if (options.help) {
   process.stdout.write(`${HELP}\n`);
   process.exitCode = 0;
 } else if (options.doctor) {
