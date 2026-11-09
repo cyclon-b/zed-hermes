@@ -4,7 +4,6 @@ import test from 'node:test';
 import {
   BUILTIN_ADVERTISED,
   DEFAULT_CATALOG,
-  OPTIONAL_CATALOG,
   mergeCommands,
   normalizeCatalog,
   shadowedByBuiltins,
@@ -20,10 +19,10 @@ test('default catalog is valid and does not shadow Hermes builtins', () => {
   }
 });
 
-test('optional catalog stays out of the default set', () => {
-  const defaults = new Set(DEFAULT_CATALOG.map((command) => command.name));
-  for (const command of OPTIONAL_CATALOG) {
-    assert.equal(defaults.has(command.name), false, `${command.name} must be opt-in`);
+test('catalog includes the previously opt-in commands', () => {
+  const names = new Set(DEFAULT_CATALOG.map((command) => command.name));
+  for (const name of ['btw', 'bg', 'moa', 'fast', 'reasoning', 'skills', 'yolo']) {
+    assert.equal(names.has(name), true, `${name} must be advertised by default`);
   }
 });
 

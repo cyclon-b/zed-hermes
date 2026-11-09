@@ -28,6 +28,7 @@ Options:
   --prompt <slash>    Slash command to send after session/new (default: /version)
   --mcp <json>        JSON array of MCP servers for session/new (default: [])
   --timeout-ms <n>    Per-step timeout (default: 20000)
+  --wait-ms <n>      Wait after session/new before prompting (default: 0)
   --help, -h          Show this help
 
 Bridge flags after \`--\` are passed to bin/zed-hermes.js (for example
@@ -40,6 +41,7 @@ function parse(argv) {
     prompt: '/version',
     mcp: [],
     timeoutMs: 20000,
+    waitMs: 0,
     bridgeArgs: [],
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -66,6 +68,7 @@ function parse(argv) {
       if (!Array.isArray(options.mcp)) throw new Error('--mcp expects a JSON array');
     }
     else if (arg === '--timeout-ms') options.timeoutMs = Number(next());
+    else if (arg === '--wait-ms') options.waitMs = Number(next());
     else throw new Error(`Unknown flag: ${arg}`);
   }
   return options;
@@ -198,6 +201,11 @@ async function runProbe(options) {
       );
     }
     process.stdout.write(`extras advertised: ${extraNames.join(', ')}\n`);
+
+    if (options.waitMs > 0) {
+      process.stdout.write(`waiting ${options.waitMs}ms before the prompt\n`);
+      await new Promise((resolvePromise) => setTimeout(resolvePromise, options.waitMs));
+    }
 
     const promptResult = await request('session/prompt', {
       sessionId,

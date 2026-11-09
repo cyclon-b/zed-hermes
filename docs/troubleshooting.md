@@ -109,9 +109,12 @@ Fix the source; a stray `print()` in a plugin corrupts the transport.
 
 ## Settings were not updated
 
-`scripts/register-zed.mjs` refuses to rewrite `settings.json` if it is not
-strict JSON (for example, it contains comments). Fix the file, or add the
-snippet manually:
+`scripts/register-zed.mjs` understands JSONC, so comments and trailing commas
+in `settings.json` survive; it only refuses a structurally invalid file. If the
+file cannot be parsed, `zed-hermes` prints the reason and the snippet instead
+of writing.
+
+To add the registry entry by hand:
 
 ```sh
 node scripts/register-zed.mjs --print

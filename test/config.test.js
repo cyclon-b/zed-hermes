@@ -11,6 +11,10 @@ import {
   resolveConfig,
 } from '../lib/config.js';
 
+const ISOLATED_ENV = {
+  ZED_HERMES_CONFIG: join(tmpdir(), 'zed-hermes-test-no-config.json'),
+};
+
 test('parseArgs collects flags, inline values and passthrough args', () => {
   const flags = parseArgs([
     '--command=hermes-dev',
@@ -81,7 +85,7 @@ test('resolveConfig applies file < env < CLI precedence', () => {
 });
 
 test('resolveConfig defaults to `hermes acp` and the default catalog', () => {
-  const config = resolveConfig({ flags: {}, env: {} });
+  const config = resolveConfig({ flags: {}, env: ISOLATED_ENV });
   assert.equal(config.command, 'hermes');
   assert.deepEqual(config.args, ['acp']);
   assert.ok(config.commands.length > 0);
@@ -93,7 +97,12 @@ test('explicit missing config file is an error, default one is not', () => {
     () => resolveConfig({ flags: { config: join(tmpdir(), 'definitely-missing-zed-hermes.json') } }),
     /Config file not found/,
   );
-  const config = resolveConfig({ flags: {}, env: {} });
+  const config = resolveConfig({
+    flags: {},
+    env: {
+      ZED_HERMES_CONFIG: join(tmpdir(), 'definitely-missing-zed-hermes-default.json'),
+    },
+  });
   assert.equal(config.configPath, undefined);
 });
 
@@ -105,7 +114,7 @@ test('defaultConfigPath is platform-aware', () => {
 
 test('shell accepts auto and string boolean spellings', () => {
   assert.equal(configFromEnv({ ZED_HERMES_SHELL: 'auto' }).shell, 'auto');
-  assert.equal(resolveConfig({ flags: {}, env: { ZED_HERMES_SHELL: 'auto' } }).shell, 'auto');
-  assert.equal(resolveConfig({ flags: {}, env: { ZED_HERMES_SHELL: 'false' } }).shell, false);
-  assert.equal(resolveConfig({ flags: { shell: false }, env: {} }).shell, false);
+  assert.equal(resolveConfig({ flags: {}, env: { ...ISOLATED_ENV, ZED_HERMES_SHELL: 'auto' } }).shell, 'auto');
+  assert.equal(resolveConfig({ flags: {}, env: { ...ISOLATED_ENV, ZED_HERMES_SHELL: 'false' } }).shell, false);
+  assert.equal(resolveConfig({ flags: { shell: false }, env: ISOLATED_ENV }).shell, false);
 });

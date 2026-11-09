@@ -10,7 +10,6 @@ import { fileURLToPath } from 'node:url';
 import {
   BUILTIN_ADVERTISED,
   DEFAULT_CATALOG,
-  OPTIONAL_CATALOG,
   normalizeCatalog,
   shadowedByBuiltins,
 } from '../lib/commands.js';
@@ -35,7 +34,7 @@ if (shadowedByBuiltins(catalog).length > 0) {
     `catalog: default entries shadow Hermes commands: ${shadowedByBuiltins(catalog).join(', ')}`,
   );
 }
-for (const command of [...catalog, ...normalizeCatalog(OPTIONAL_CATALOG)]) {
+for (const command of catalog) {
   if (!command.description) failures.push(`catalog: ${command.name} has no description`);
 }
 
@@ -46,7 +45,7 @@ for (const command of catalog) {
   }
 }
 
-const known = new Set([...catalog, ...normalizeCatalog(OPTIONAL_CATALOG)].map((c) => c.name));
+const known = new Set(catalog.map((command) => command.name));
 for (const builtin of BUILTIN_ADVERTISED) {
   if (known.has(builtin)) failures.push(`catalog: ${builtin} duplicates a Hermes builtin`);
 }

@@ -61,9 +61,14 @@ when you reopen the thread.
    call."* Tools are exposed as `mcp__<server>__<tool>`.
 2. **Transport.** Run `dev: open acp logs` from the Command Palette and look at
    the `session/new` request. `mcpServers` should contain your Zed servers.
-3. **Bridge.** `npm run probe -- --mcp '[{"name":"probe","command":"node","args":["-e",""]}]'`
-   sends a dummy entry and confirms the request is accepted. It does not prove
-   a real server works — use step 1 for that.
+3. **Bridge.** `npm run probe -- --mcp '[{"name":"probe","command":"node","args":["./my-mcp-server.mjs"],"env":[]}]'`
+   sends a real stdio server entry and confirms Hermes accepts it. ACP requires
+   `env` to be an array of `{name, value}` objects for stdio servers, so pass
+   `[]` when there is nothing to set.
+4. **Tool call.** Discovery of editor servers happens before the first model
+   turn. `/tools` issued immediately after `session/new` may not list them yet;
+   asking the model to call one (`"Call the <tool> with ..."`) is the definitive
+   check. The tools are exposed as `mcp__<server>__<tool>`.
 
 ## Failure modes
 

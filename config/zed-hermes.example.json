@@ -55,6 +55,40 @@
       "name": "refine",
       "description": "Run the memory and skill self-improvement review now",
       "hint": "[focus]"
+    },
+    {
+      "name": "btw",
+      "description": "Ask a side question about the current conversation",
+      "hint": "<question>"
+    },
+    {
+      "name": "bg",
+      "description": "Run a prompt in a separate background session",
+      "hint": "<prompt>"
+    },
+    {
+      "name": "moa",
+      "description": "Run one prompt through the default Mixture of Agents preset",
+      "hint": "<prompt>"
+    },
+    {
+      "name": "fast",
+      "description": "Show or set fast mode for supported model routes",
+      "hint": "[normal|fast|auto|cold|status]"
+    },
+    {
+      "name": "reasoning",
+      "description": "Show or set reasoning effort and reasoning display",
+      "hint": "[level|show|hide]"
+    },
+    {
+      "name": "skills",
+      "description": "Review pending skill writes (approve, reject, diff)",
+      "hint": "[pending|approve|reject|diff|approval]"
+    },
+    {
+      "name": "yolo",
+      "description": "Toggle YOLO mode, which skips approval prompts"
     }
   ]
 }

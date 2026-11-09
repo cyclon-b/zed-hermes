@@ -14,6 +14,7 @@ import test from 'node:test';
 import {
   buildEntry,
   isOurEntry,
+  parseJsonc,
   updateSettingsFile,
   zedSettingsPath,
 } from '../scripts/register-zed.mjs';
@@ -81,12 +82,84 @@ test('revert refuses to delete a foreign entry unless forced', (t) => {
 });
 
 test('malformed settings are reported, never overwritten', (t) => {
-  const original = '{ // comments are not strict JSON\n "theme": "x" }\n';
+  const original = '{ "theme": }\n';
   const { path, cleanup } = tempSettings(original);
   t.after(cleanup);
 
-  assert.throws(() => updateSettingsFile(path, {}), /not strict JSON/);
+  assert.throws(() => updateSettingsFile(path, {}), /Invalid JSON value|Expected/);
   assert.equal(readFileSync(path, 'utf8'), original);
+});
+
+test('adds the entry to JSONC without touching comments', (t) => {
+  const original = [
+    '// Zed settings',
+    '{',
+    '  // appearance',
+    '  "theme": "One Dark",',
+    '  "agent_servers": {',
+    '    "Other": { "type": "custom", "command": "other", "args": [] },',
+    '  },',
+    '}',
+    '',
+  ].join('\n');
+  const { path, cleanup } = tempSettings(original);
+  t.after(cleanup);
+
+  const result = updateSettingsFile(path, { entry: buildEntry({ bridge: '/repo/bin/zed-hermes.js' }) });
+  assert.equal(result.changed, true);
+  const text = readFileSync(path, 'utf8');
+  assert.match(text, /\/\/ Zed settings/);
+  assert.match(text, /\/\/ appearance/);
+  assert.match(text, /"Other"/);
+
+  const settings = parseJsonc(text).value;
+  assert.deepEqual(settings.agent_servers.Hermes.args, ['/repo/bin/zed-hermes.js']);
+  assert.equal(settings.agent_servers.Other.command, 'other');
+});
+
+test('revert from JSONC keeps comments and other agents', (t) => {
+  const original = [
+    '{',
+    '  // keep me',
+    '  "agent_servers": {',
+    '    "Hermes": {',
+    '      "type": "custom",',
+    '      "command": "node",',
+    '      "args": ["/repo/bin/zed-hermes.js"],',
+    '      "env": {},',
+    '    },',
+    '    "Other": { "type": "custom", "command": "other", "args": [] },',
+    '  },',
+    '  "theme": "One Dark",',
+    '}',
+    '',
+  ].join('\n');
+  const { path, cleanup } = tempSettings(original);
+  t.after(cleanup);
+
+  const result = updateSettingsFile(path, {
+    revert: true,
+    bridge: '/repo/bin/zed-hermes.js',
+  });
+  assert.equal(result.changed, true);
+  const text = readFileSync(path, 'utf8');
+  assert.match(text, /\/\/ keep me/);
+
+  const settings = parseJsonc(text).value;
+  assert.equal('Hermes' in settings.agent_servers, false);
+  assert.equal(settings.agent_servers.Other.command, 'other');
+  assert.equal(settings.theme, 'One Dark');
+});
+
+test('creates agent_servers when the JSONC file has none', (t) => {
+  const original = '{\n  // only a theme\n  "theme": "x",\n}\n';
+  const { path, cleanup } = tempSettings(original);
+  t.after(cleanup);
+
+  updateSettingsFile(path, { entry: buildEntry({ bridge: '/repo/bin/zed-hermes.js' }) });
+  const text = readFileSync(path, 'utf8');
+  assert.match(text, /\/\/ only a theme/);
+  assert.deepEqual(parseJsonc(text).value.agent_servers.Hermes.args, ['/repo/bin/zed-hermes.js']);
 });
 
 test('dry run does not write', (t) => {

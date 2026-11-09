@@ -49,40 +49,41 @@ wording and hints always win.
 | `/rollback` | `[number]` | List or restore filesystem checkpoints |
 | `/branch` | `[--here] [name]` | Branch the current session |
 | `/refine` | `[focus]` | Run the memory/skill self-improvement review |
+| `/btw` | `<question>` | Ask a side question about the current conversation |
+| `/bg` | `<prompt>` | Run a prompt in a separate background session |
+| `/moa` | `<prompt>` | Run one prompt through the Mixture of Agents preset |
+| `/fast` | `[normal\|fast\|auto\|cold\|status]` | Show or set fast mode for supported routes |
+| `/reasoning` | `[level\|show\|hide]` | Show or set reasoning effort and display |
+| `/skills` | `[pending\|approve\|reject\|diff\|approval]` | Review pending skill writes |
+| `/yolo` | — | Toggle YOLO mode (skips approval prompts) |
 
 These are chosen because they are useful in an editor and have a clear,
 side-effect-conscious purpose.
 
-## Opt-in commands
+## Caveats for the added commands
 
-Add any of these to the `commands` array in your config. They are not
-advertised by default because they are situational or easy to misuse.
+All of these are served by the Hermes gateway, but a few deserve a warning:
 
-| Command | Hint | Why opt-in |
-|---|---|---|
-| `/btw` | `<question>` | One-off side question; easy to confuse with a normal prompt |
-| `/bg` | `<prompt>` | Starts work in a separate background session |
-| `/moa` | `<prompt>` | Mixture of Agents; expensive, one-shot |
-| `/fast` | `[normal\|fast\|auto\|cold\|status]` | Changes request pricing/priority for supported routes |
-| `/reasoning` | `[level\|show\|hide]` | Changes reasoning effort and display |
-| `/skills` | `[pending\|approve\|reject\|diff\|approval]` | Only the write-approval subcommands are served over the gateway |
-| `/yolo` | — | Disables approval prompts; exposing it invites accidents |
+- **`/yolo`** turns off dangerous-command approval for the session. It is in
+the menu because it is a genuine Hermes command; use it deliberately, and
+remember that any approval prompt you dismiss otherwise is there for a reason.
+- **`/skills`** exposes only the write-approval subcommands over the gateway
+(`pending`, `approve`, `reject`, `diff`, `approval`). Search and install stay
+CLI-only and will be refused.
+- **`/bg`** and **`/moa`** spawn work outside the current turn; results arrive
+as background events and can be expensive.
+- **`/fast`** changes request pricing/priority on supported model routes; it is
+a no-op elsewhere.
+- **`/memory`** and **`/refine`** act on Hermes' persistent memory and skills,
+not on the repository.
 
-Example:
+## Customizing the list
 
-```json
-{
-  "commands": [
-    { "name": "plan", "description": "Write an implementation plan", "hint": "[task]" },
-    { "name": "diff", "description": "Show git changes" },
-    { "name": "btw", "description": "Ask a side question", "hint": "<question>" }
-  ]
-}
-```
-
-The `commands` key replaces the default catalog; copy entries from
-[`config/zed-hermes.example.json`](../config/zed-hermes.example.json) that you
-want to keep.
+The `commands` key in your config **replaces** the default catalog. To drop a
+single entry, copy the defaults from
+[`config/zed-hermes.example.json`](../config/zed-hermes.example.json) and omit
+it. An empty array disables the extras entirely and leaves only Hermes' own 14
+advertised commands.
 
 ## Why a refusal is not an error
 

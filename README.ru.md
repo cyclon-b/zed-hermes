@@ -190,10 +190,17 @@ npm run probe -- --mock # тот же probe против встроенного 
 | `/rollback [number]` | Список и восстановление файловых чекпоинтов |
 | `/branch [--here] [name]` | Ветвит текущую сессию |
 | `/refine [focus]` | Немедленный self-improvement-прогон памяти и скиллов |
+| `/btw <question>` | Быстрый вопрос по текущей беседе |
+| `/bg <prompt>` | Запуск промпта в отдельной фоновой сессии |
+| `/moa <prompt>` | Один промпт через пресет Mixture of Agents |
+| `/fast [normal\|fast\|auto\|cold\|status]` | Показ или установка fast mode для поддерживаемых маршрутов |
+| `/reasoning [level\|show\|hide]` | Управление reasoning effort и его отображением |
+| `/skills [pending\|approve\|reject\|diff\|approval]` | Работа с очередью записей скиллов |
+| `/yolo` | Переключение YOLO-режима (без запросов подтверждения) |
 
-Опционально (не объявляются по умолчанию): `/btw`, `/bg`, `/moa`, `/fast`,
-`/reasoning`, `/skills`, `/yolo`. Добавьте их в `commands` в конфиге.
-Когда их стоит показывать — см. [docs/commands.md](docs/commands.md).
+`/yolo` отключает подтверждение опасных команд в сессии, а `/skills` через
+шлюз отдаёт только подкоманды подтверждения записи — предупреждения и способ
+убрать пункт из списка см. в [docs/commands.md](docs/commands.md).
 
 ## Конфигурация
 

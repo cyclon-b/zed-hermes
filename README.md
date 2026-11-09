@@ -190,10 +190,18 @@ The bridge adds these to the menu. All of them are real Hermes commands.
 | `/rollback [number]` | List or restore filesystem checkpoints |
 | `/branch [--here] [name]` | Branch the current session |
 | `/refine [focus]` | Run the memory/skill self-improvement review |
+| `/btw <question>` | Ask a side question about the current conversation |
+| `/bg <prompt>` | Run a prompt in a separate background session |
+| `/moa <prompt>` | Run one prompt through the Mixture of Agents preset |
+| `/fast [normal\|fast\|auto\|cold\|status]` | Show or set fast mode for supported routes |
+| `/reasoning [level\|show\|hide]` | Show or set reasoning effort and display |
+| `/skills [pending\|approve\|reject\|diff\|approval]` | Review pending skill writes |
+| `/yolo` | Toggle YOLO mode (skips approval prompts) |
 
-Opt-in (not advertised by default): `/btw`, `/bg`, `/moa`, `/fast`, `/reasoning`,
-`/skills`, `/yolo`. Add them to `commands` in your config. See
-[docs/commands.md](docs/commands.md) for when each one is worth exposing.
+`/yolo` disables dangerous-command approval for the session and `/skills`
+exposes only its write-approval subcommands over the gateway — see
+[docs/commands.md](docs/commands.md) for those caveats and for how to drop an
+entry from the list.
 
 ## Configuration
 
