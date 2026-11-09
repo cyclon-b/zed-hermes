@@ -35,6 +35,8 @@ test('joinCommandLine quotes tokens that need it', () => {
   );
   assert.equal(joinCommandLine('hermes', ['a b'], 'linux'), "hermes 'a b'");
   assert.equal(joinCommandLine('hermes', [''], 'linux'), "hermes ''");
+  assert.equal(joinCommandLine('hermes', ['a"b'], 'win32'), 'hermes "a""b"');
+  assert.equal(joinCommandLine('~/bin/hermes', ['acp'], 'linux'), '~/bin/hermes acp');
 });
 
 test('describeSpawnError explains ENOENT and passes other errors through', () => {
