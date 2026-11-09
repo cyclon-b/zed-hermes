@@ -1,0 +1,60 @@
+{
+  "command": "hermes",
+  "args": ["acp"],
+  "env": {},
+  "shell": "auto",
+  "synthesize": true,
+  "synthesizeDelayMs": 300,
+  "commands": [
+    {
+      "name": "plan",
+      "description": "Write an implementation plan to .hermes/plans/ without executing it",
+      "hint": "[task]"
+    },
+    {
+      "name": "init",
+      "description": "Generate or update AGENTS.md from a repository scan",
+      "hint": "[notes]"
+    },
+    {
+      "name": "diff",
+      "description": "Show git changes in the working directory",
+      "hint": "[staged|all|session] [--stat]"
+    },
+    {
+      "name": "goal",
+      "description": "Set a standing goal Hermes keeps working toward across turns",
+      "hint": "[<objective>|status|pause|resume|clear]"
+    },
+    {
+      "name": "learn",
+      "description": "Distill a reusable skill from a directory, URL, workflow or notes",
+      "hint": "<what to learn from>"
+    },
+    {
+      "name": "review",
+      "description": "Spawn an independent reviewer subagent for the work just discussed",
+      "hint": "[instructions]"
+    },
+    {
+      "name": "memory",
+      "description": "Review pending memory writes and toggle the write gate",
+      "hint": "[pending|approve|reject|approval]"
+    },
+    {
+      "name": "rollback",
+      "description": "List or restore filesystem checkpoints",
+      "hint": "[number]"
+    },
+    {
+      "name": "branch",
+      "description": "Branch the current session into an independent copy",
+      "hint": "[--here] [name]"
+    },
+    {
+      "name": "refine",
+      "description": "Run the memory and skill self-improvement review now",
+      "hint": "[focus]"
+    }
+  ]
+}

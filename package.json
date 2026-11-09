@@ -1,0 +1,72 @@
+{
+  "name": "zed-hermes",
+  "version": "0.1.0",
+  "description": "Hermes Agent integration for Zed: advertises Hermes slash commands in the Agent Panel and keeps Zed's MCP servers flowing over ACP.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./commands": "./lib/commands.js",
+    "./config": "./lib/config.js"
+  },
+  "bin": {
+    "zed-hermes": "bin/zed-hermes.js"
+  },
+  "files": [
+    "bin/zed-hermes.js",
+    "lib/index.js",
+    "lib/cli.js",
+    "lib/commands.js",
+    "lib/config.js",
+    "lib/framing.js",
+    "lib/proxy.js",
+    "lib/spawn.js",
+    "scripts/check.mjs",
+    "scripts/probe.mjs",
+    "scripts/register-zed.mjs",
+    "scripts/fixtures/mock-acp.mjs",
+    "config/zed-hermes.example.json",
+    "zed/settings.example.json",
+    "docs/commands.md",
+    "docs/mcp.md",
+    "docs/troubleshooting.md",
+    "install.ps1",
+    "install.sh",
+    "LICENSE",
+    "NOTICE",
+    "CHANGELOG.md",
+    "README.md",
+    "README.ru.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "test": "node --test",
+    "probe": "node scripts/probe.mjs",
+    "doctor": "node scripts/probe.mjs --doctor",
+    "register-zed": "node scripts/register-zed.mjs"
+  },
+  "keywords": [
+    "hermes",
+    "hermes-agent",
+    "nous-research",
+    "acp",
+    "agent-client-protocol",
+    "zed",
+    "slash-commands",
+    "mcp",
+    "coding-agent"
+  ],
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "Gennady Artamonov",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cyclon-b/zed-hermes.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cyclon-b/zed-hermes/issues"
+  },
+  "homepage": "https://github.com/cyclon-b/zed-hermes#readme"
+}

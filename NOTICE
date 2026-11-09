@@ -1,0 +1,27 @@
+zed-hermes
+Copyright (c) 2026 Gennady Artamonov
+
+This project is licensed under the PolyForm Noncommercial License 1.0.0.
+The full text is in LICENSE. In plain terms:
+
+- You may use, copy, modify and redistribute this software for
+  noncommercial purposes, provided this license and the Required Notice
+  travel with it.
+- Commercial use is not granted, including selling this software, selling
+  derivative works based on it, or bundling it into a paid product or
+  service.
+- For commercial licensing, contact the author.
+
+This project is an independent integration. It is not affiliated with, or
+endorsed by, Nous Research (Hermes Agent) or Zed Industries (Zed).
+
+Third-party names and projects referenced by this repository remain the
+property of their respective owners:
+
+- Hermes Agent — https://github.com/NousResearch/hermes-agent (MIT)
+- Zed — https://zed.dev
+- Agent Client Protocol — https://agentclientprotocol.com
+- PolyForm Noncommercial License 1.0.0 — https://polyformproject.org
+
+No third-party source code is vendored in this repository. Hermes and Zed are
+started as separate processes and are not distributed with zed-hermes.

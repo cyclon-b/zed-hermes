@@ -1,0 +1,10 @@
+{
+  "agent_servers": {
+    "Hermes": {
+      "type": "custom",
+      "command": "node",
+      "args": ["C:/path/to/zed-hermes/bin/zed-hermes.js"],
+      "env": {}
+    }
+  }
+}
